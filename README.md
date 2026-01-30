@@ -39,8 +39,8 @@ yolov5-obj-detection/
 │   │       ├── train/
 │   │       └── val/
 │   ├── fire_data/
-│   │   └── fire_dataset.yaml     # Fire/smoke dataset config
-│   └── preprocess_fire_dataset.py
+│   │   ├── fire_dataset.yaml     # Fire/smoke dataset config
+│   │   └── preprocess_fire_dataset.py
 ├── scripts/
 │   ├── create_dummy_dataset.py   # Generate synthetic training data
 │   ├── train_model.py            # Python training wrapper
@@ -277,7 +277,7 @@ names:
 If you have the fire/smoke dataset described in this repo:
 
 ```bash
-python data/preprocess_fire_dataset.py --dataset-root "/kaggle/working/D Fire Dataset" --create-empty-labels
+python data/fire_data/preprocess_fire_dataset.py --dataset-root "/kaggle/working/D Fire Dataset" --create-empty-labels
 ```
 
 This will output a YOLOv5-ready dataset under `data/fire_data/`.

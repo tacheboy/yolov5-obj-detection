@@ -2,7 +2,7 @@
  # Use with: python train.py --data ../data/fire_data/fire_dataset.yaml --weights yolov5s.pt --epochs 50
  
  # Dataset root directory (relative to yolov5/ directory when training from there)
- # This is the output of data/preprocess_fire_dataset.py by default.
+# This is the output of data/fire_data/preprocess_fire_dataset.py by default.
  path: ../data/fire_data
  
  # Train/val/test sets (relative to 'path')

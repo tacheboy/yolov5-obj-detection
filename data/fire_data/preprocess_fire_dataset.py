@@ -1,4 +1,4 @@
-"""
+ """
  Preprocess and validate a fire/smoke dataset for YOLOv5 training.
  
  Expected input structure:
@@ -19,9 +19,9 @@
      labels/train, labels/val, labels/test
  
  Usage:
-   python data/preprocess_fire_dataset.py --dataset-root "D:\\Fire Dataset"
-   python data/preprocess_fire_dataset.py --dataset-root "/kaggle/working/D Fire Dataset"
-"""
+   python data/fire_data/preprocess_fire_dataset.py --dataset-root "D:\\Fire Dataset"
+   python data/fire_data/preprocess_fire_dataset.py --dataset-root "/kaggle/working/D Fire Dataset"
+ """
  
  import argparse
  import shutil
@@ -43,7 +43,7 @@
      if output_path.is_absolute():
          return output_path
      script_dir = Path(__file__).resolve().parent
-     project_root = script_dir.parent
+     project_root = script_dir.parent.parent
      return project_root / output_path
  
  

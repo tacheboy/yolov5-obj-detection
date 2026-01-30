@@ -13,8 +13,8 @@ yolov5-obj-detection/
 │   ├── dummy/
 │   │   └── dataset.yaml    # Dummy dataset configuration
 │   ├── fire_data/
-│   │   └── fire_dataset.yaml # Fire/smoke dataset configuration
-│   └── preprocess_fire_dataset.py
+│   │   ├── fire_dataset.yaml # Fire/smoke dataset configuration
+│   │   └── preprocess_fire_dataset.py
 └── scripts/
     ├── create_dummy_dataset.py
     ├── train_model.py

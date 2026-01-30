@@ -17,7 +17,7 @@ This file lists all files that should be committed to your Git repository.
 ### data/
 - ✅ `data/dummy/dataset.yaml` - Dummy dataset configuration
 - ✅ `data/fire_data/fire_dataset.yaml` - Fire/smoke dataset configuration
-- ✅ `data/preprocess_fire_dataset.py` - Fire/smoke preprocessing pipeline
+- ✅ `data/fire_data/preprocess_fire_dataset.py` - Fire/smoke preprocessing pipeline
 
 ### scripts/
 - ✅ `scripts/create_dummy_dataset.py` - Dummy dataset generator
@@ -127,7 +127,7 @@ git ls-tree -r main --name-only
 # setup.sh
 # data/dummy/dataset.yaml
 # data/fire_data/fire_dataset.yaml
-# data/preprocess_fire_dataset.py
+# data/fire_data/preprocess_fire_dataset.py
 # scripts/create_dummy_dataset.py
 # scripts/train_model.py
 # scripts/validate_model.py
