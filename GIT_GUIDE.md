@@ -1,11 +1,5 @@
 # Git Guide for YOLOv5 Object Detection
 
-This guide explains what to commit to Git and how to set up your repository.
-
-## Files to Commit
-
-### ✅ DO Commit These Files
-
 ```
 yolov5-obj-detection/
 ├── .gitignore              # Git ignore rules
@@ -25,18 +19,6 @@ yolov5-obj-detection/
     └── val.ps1
 ```
 
-### ❌ DO NOT Commit These (already in .gitignore)
-
-```
-.venv/                      # Virtual environment
-yolov5/                     # Cloned YOLOv5 repo (users will clone it)
-data/dummy/                 # Generated dummy dataset
-data/processed/             # User's processed datasets
-yolov5/runs/                # Training outputs
-*.pt                        # Model weights
-__pycache__/                # Python cache
-*.pyc                       # Compiled Python
-```
 
 ## Initial Setup for Git
 
