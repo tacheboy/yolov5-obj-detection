@@ -9,6 +9,12 @@ Usage:
     python scripts/train_model.py --epochs 100 --batch 8 --weights yolov5m.pt
 """
 
+import os
+
+# --- SILENCE WARNINGS ---
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['WANDB_MODE'] = 'disabled'
+
 import argparse
 import os
 import subprocess
