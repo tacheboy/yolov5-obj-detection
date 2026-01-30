@@ -1,6 +1,6 @@
 # YOLOv5 Object Detection - Setup Script for Windows
 # This script automates the setup process for the YOLOv5 object detection pipeline
-
+# scr   
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "YOLOv5 Object Detection Pipeline Setup" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan

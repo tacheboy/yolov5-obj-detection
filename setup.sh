@@ -1,7 +1,7 @@
 #!/bin/bash
 # YOLOv5 Object Detection - Setup Script for Linux/Mac
 # This script automates the setup process for the YOLOv5 object detection pipeline
-
+#setup
 set -e  # Exit on error
 
 echo "========================================"
@@ -9,7 +9,6 @@ echo "YOLOv5 Object Detection Pipeline Setup"
 echo "========================================"
 echo ""
 
-# Check if Python is installed
 echo "[1/5] Checking Python installation..."
 if ! command -v python3 &> /dev/null; then
     echo "Error: Python 3 is not installed"
@@ -21,7 +20,6 @@ PYTHON_VERSION=$(python3 --version)
 echo "Found: $PYTHON_VERSION"
 echo ""
 
-# Check if YOLOv5 is cloned
 echo "[2/5] Checking YOLOv5 repository..."
 if [ ! -d "yolov5" ]; then
     echo "YOLOv5 not found. Cloning repository..."
