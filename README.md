@@ -30,14 +30,17 @@ A complete pipeline for training and validating YOLOv5 models on custom datasets
 yolov5-obj-detection/
 ├── .venv/                        # Python virtual environment
 ├── data/
-│   ├── dataset.yaml              # Dataset configuration
-│   └── dummy/                    # Dummy dataset (generated)
-│       ├── images/
-│       │   ├── train/
-│       │   └── val/
-│       └── labels/
-│           ├── train/
-│           └── val/
+│   ├── dummy/
+│   │   ├── dataset.yaml          # Dummy dataset config
+│   │   ├── images/
+│   │   │   ├── train/
+│   │   │   └── val/
+│   │   └── labels/
+│   │       ├── train/
+│   │       └── val/
+│   ├── fire_data/
+│   │   └── fire_dataset.yaml     # Fire/smoke dataset config
+│   └── preprocess_fire_dataset.py
 ├── scripts/
 │   ├── create_dummy_dataset.py   # Generate synthetic training data
 │   ├── train_model.py            # Python training wrapper
@@ -121,6 +124,7 @@ python scripts/create_dummy_dataset.py
 - `data/dummy/images/val/` - 5 validation images
 - `data/dummy/labels/` - YOLO-format labels (class_id, x_center, y_center, width, height)
 - 3 classes: class1, class2, class3
+- Dataset config: `data/dummy/dataset.yaml`
 
 **Customize dataset generation:**
 ```bash
@@ -142,7 +146,7 @@ python scripts/train_model.py --epochs 50 --batch 8 --cache ram
 **Direct command (from yolov5/ directory):**
 ```bash
 cd yolov5
-..\.venv\Scripts\python.exe train.py --img 640 --batch 8 --epochs 50 --data ../data/dataset.yaml --weights yolov5s.pt
+..\.venv\Scripts\python.exe train.py --img 640 --batch 8 --epochs 50 --data ../data/dummy/dataset.yaml --weights yolov5s.pt
 ```
 
 **Training outputs:**
@@ -165,7 +169,7 @@ python scripts/validate_model.py --weights yolov5/runs/train/exp/weights/best.pt
 **Direct command (from yolov5/ directory):**
 ```bash
 cd yolov5
-..\.venv\Scripts\python.exe val.py --weights runs/train/exp/weights/best.pt --data ../data/dataset.yaml --verbose
+..\.venv\Scripts\python.exe val.py --weights runs/train/exp/weights/best.pt --data ../data/dummy/dataset.yaml --verbose
 ```
 
 **Validation outputs:**
@@ -190,7 +194,7 @@ python scripts/train_model.py --no-augment
 Or use a custom hyperparameter file:
 ```bash
 cd yolov5
-python train.py --hyp data/hyps/hyp.no-augmentation.yaml --data ../data/dataset.yaml --weights yolov5s.pt
+python train.py --hyp data/hyps/hyp.no-augmentation.yaml --data ../data/dummy/dataset.yaml --weights yolov5s.pt
 ```
 
 ## Training Options
@@ -201,7 +205,7 @@ python train.py --hyp data/hyps/hyp.no-augmentation.yaml --data ../data/dataset.
 | `--batch` | 16 | Batch size |
 | `--img` | 640 | Input image size |
 | `--weights` | yolov5s.pt | Pretrained weights (yolov5n/s/m/l/x.pt) |
-| `--data` | ../data/dataset.yaml | Dataset configuration |
+| `--data` | ../data/dummy/dataset.yaml | Dataset configuration |
 | `--cache` | None | Cache images (ram/disk) for faster training |
 | `--resume` | False | Resume from last checkpoint |
 
@@ -255,9 +259,9 @@ Example:
 1 0.2 0.8 0.1 0.15
 ```
 
-### Update dataset.yaml
+### Create a dataset YAML
 
-Edit `data/dataset.yaml` to point to your dataset:
+Create a dataset YAML under `data/` and point it to your dataset:
 ```yaml
 path: ../data/your_dataset  # or absolute path
 train: images/train
@@ -268,15 +272,19 @@ names:
   # ...
 ```
 
-## Future: Preprocessing Pipeline
+## Fire Dataset Preprocessing (Smoke/Fire)
 
-For real datasets, add a preprocessing script at `scripts/preprocess_dataset.py` that:
-1. Reads raw data (images + annotations in any format)
-2. Converts annotations to YOLO format
-3. Outputs to `data/processed/` with the same structure as `data/dummy/`
-4. Update `data/dataset.yaml` to point to `../data/processed`
+If you have the fire/smoke dataset described in this repo:
 
-The training and validation pipeline remains unchanged.
+```bash
+python data/preprocess_fire_dataset.py --dataset-root "/kaggle/working/D Fire Dataset" --create-empty-labels
+```
+
+This will output a YOLOv5-ready dataset under `data/fire_data/`.
+Train with:
+```bash
+python scripts/train_model.py --data ../data/fire_data/fire_dataset.yaml
+```
 
 ## Troubleshooting
 
@@ -343,7 +351,7 @@ python scripts/train_model.py --no-augment
 Edit or create custom hyperparameter files in `yolov5/data/hyps/`:
 ```bash
 cd yolov5
-python train.py --hyp data/hyps/hyp.scratch-high.yaml --data ../data/dataset.yaml
+python train.py --hyp data/hyps/hyp.scratch-high.yaml --data ../data/dummy/dataset.yaml
 ```
 
 ### Export Trained Model

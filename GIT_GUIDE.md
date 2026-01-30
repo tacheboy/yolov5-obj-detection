@@ -10,7 +10,11 @@ yolov5-obj-detection/
 ├── setup.ps1               # Windows setup script
 ├── setup.sh                # Linux/Mac setup script
 ├── data/
-│   └── dataset.yaml        # Dataset configuration template
+│   ├── dummy/
+│   │   └── dataset.yaml    # Dummy dataset configuration
+│   ├── fire_data/
+│   │   └── fire_dataset.yaml # Fire/smoke dataset configuration
+│   └── preprocess_fire_dataset.py
 └── scripts/
     ├── create_dummy_dataset.py
     ├── train_model.py
@@ -75,7 +79,7 @@ The setup script will:
 
 **Downloaded (from your repo):**
 - All scripts and documentation
-- Dataset configuration template
+- Dataset configuration templates
 - Setup scripts
 
 **NOT Downloaded (created during setup):**

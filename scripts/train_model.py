@@ -73,7 +73,7 @@ def main():
         "--data",
         type=str,
         default=None,
-        help="Dataset YAML path (default: ../data/dataset.yaml relative to yolov5/)",
+        help="Dataset YAML path (default: ../data/dummy/dataset.yaml relative to yolov5/)",
     )
     parser.add_argument(
         "--name", type=str, default="", help="Experiment name (optional)"
@@ -113,7 +113,7 @@ def main():
         install_yolov5_requirements(yolo_dir)
     
     # Default data path (relative to yolov5 directory)
-    data_path = args.data or "../data/dataset.yaml"
+    data_path = args.data or "../data/dummy/dataset.yaml"
     
     # Build training command
     cmd = [

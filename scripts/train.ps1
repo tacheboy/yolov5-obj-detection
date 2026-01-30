@@ -1,7 +1,7 @@
 # YOLOv5 Training Wrapper Script
 # Run from project root: .\scripts\train.ps1
 #
-# This script trains a YOLOv5 model on the dataset defined in data/dataset.yaml
+# This script trains a YOLOv5 model on the dataset defined in data/dummy/dataset.yaml
 # Adjust hyperparameters below as needed.
 
 param(
@@ -9,7 +9,7 @@ param(
     [int]$BatchSize = 16,
     [int]$ImgSize = 640,
     [string]$Weights = "yolov5s.pt",
-    [string]$Data = "../data/dataset.yaml",
+    [string]$Data = "../data/dummy/dataset.yaml",
     [string]$Name = "",
     [switch]$Resume,
     [switch]$NoAugment

@@ -6,7 +6,7 @@
 param(
     [Parameter(Mandatory=$false)]
     [string]$Weights = "runs/train/exp/weights/best.pt",
-    [string]$Data = "../data/dataset.yaml",
+    [string]$Data = "../data/dummy/dataset.yaml",
     [int]$BatchSize = 32,
     [int]$ImgSize = 640,
     [string]$Task = "val",

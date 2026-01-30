@@ -15,7 +15,9 @@ This file lists all files that should be committed to your Git repository.
 - ✅ `setup.sh` - Linux/Mac automated setup script
 
 ### data/
-- ✅ `data/dataset.yaml` - Dataset configuration template
+- ✅ `data/dummy/dataset.yaml` - Dummy dataset configuration
+- ✅ `data/fire_data/fire_dataset.yaml` - Fire/smoke dataset configuration
+- ✅ `data/preprocess_fire_dataset.py` - Fire/smoke preprocessing pipeline
 
 ### scripts/
 - ✅ `scripts/create_dummy_dataset.py` - Dummy dataset generator
@@ -123,7 +125,9 @@ git ls-tree -r main --name-only
 # requirements.txt
 # setup.ps1
 # setup.sh
-# data/dataset.yaml
+# data/dummy/dataset.yaml
+# data/fire_data/fire_dataset.yaml
+# data/preprocess_fire_dataset.py
 # scripts/create_dummy_dataset.py
 # scripts/train_model.py
 # scripts/validate_model.py

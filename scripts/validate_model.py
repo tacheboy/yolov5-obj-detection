@@ -74,7 +74,7 @@ def main():
         "--data",
         type=str,
         default=None,
-        help="Dataset YAML path (default: ../data/dataset.yaml relative to yolov5/)",
+        help="Dataset YAML path (default: ../data/dummy/dataset.yaml relative to yolov5/)",
     )
     parser.add_argument(
         "--batch", type=int, default=32, help="Batch size (default: 32)"
@@ -131,7 +131,7 @@ def main():
         print(f"Auto-detected weights: {weights_path}")
     
     # Default data path (relative to yolov5 directory)
-    data_path = args.data or "../data/dataset.yaml"
+    data_path = args.data or "../data/dummy/dataset.yaml"
     
     # Build validation command
     cmd = [

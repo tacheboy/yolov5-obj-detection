@@ -1,0 +1,24 @@
+ # Fire/Smoke Dataset Configuration (YOLOv5)
+ # Use with: python train.py --data ../data/fire_data/fire_dataset.yaml --weights yolov5s.pt --epochs 50
+ 
+ # Dataset root directory (relative to yolov5/ directory when training from there)
+ # This is the output of data/preprocess_fire_dataset.py by default.
+ path: ../data/fire_data
+ 
+ # Train/val/test sets (relative to 'path')
+ train: images/train
+ val: images/val
+ test: images/test
+ 
+ # Number of classes
+ nc: 2
+ 
+ # Class names (dictionary format for YOLOv5)
+ names:
+   0: smoke
+   1: fire
+ 
+ # Optional dataset metadata (ignored by YOLOv5)
+ train_count: 14122
+ val_count: 3099
+ test_count: 4306
