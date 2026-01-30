@@ -37,16 +37,16 @@ env/
 # Jupyter Notebook
 .ipynb_checkpoints/
 
-# YOLOv5 cloned repo (optional - uncomment if you don't want to track it)
-# yolov5/
+# YOLOv5 cloned repo (exclude - users will clone it during setup)
+yolov5/
 
 # YOLOv5 training/validation outputs (large files)
-yolov5/runs/
 runs/
 
-# Downloaded weights
+# Downloaded weights (except model configs)
 *.pt
-!yolov5/**/*.pt
+*.pth
+*.weights
 
 # Dataset - generated dummy data (can be regenerated)
 data/dummy/

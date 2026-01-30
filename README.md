@@ -1,6 +1,28 @@
 # YOLOv5 Object Detection
 
-Train and validate YOLOv5 models on custom datasets with data augmentation.
+A complete pipeline for training and validating YOLOv5 models on custom datasets with data augmentation. Includes dummy dataset generation for quick testing and a framework for preprocessing your own datasets.
+
+## Features
+
+- 🚀 Automated dummy dataset generation with synthetic images
+- 🔄 YOLOv5 training with built-in data augmentation (mosaic, mixup, flips, etc.)
+- 📊 Validation with detailed metrics (mAP50, mAP50-95, precision, recall)
+- 💻 Cross-platform wrapper scripts (Python & PowerShell)
+- 📝 Easy-to-follow setup for new users
+- 🎯 Ready for custom dataset preprocessing
+
+## Table of Contents
+
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
+- [Training Options](#training-options)
+- [Model Variants](#model-variants)
+- [Data Augmentation](#data-augmentation)
+- [Using Your Own Dataset](#using-your-own-dataset)
+- [Troubleshooting](#troubleshooting)
+- [Advanced Usage](#advanced-usage)
+- [References](#references)
 
 ## Project Structure
 
@@ -29,82 +51,126 @@ yolov5-obj-detection/
 
 ## Quick Start
 
-### 1. Clone YOLOv5 (if not already done)
+Follow these steps to set up and run the complete pipeline:
+
+### Step 1: Clone This Repository
 
 ```bash
+git clone <your-repo-url>
 cd yolov5-obj-detection
+```
+
+### Step 2: Clone YOLOv5
+
+```bash
 git clone https://github.com/ultralytics/yolov5.git
 ```
 
-### 2. Create Virtual Environment and Install Dependencies
+### Step 3: Set Up Python Environment
+
+#### Option A: Automated Setup (Recommended)
+
+**Windows (PowerShell):**
+```powershell
+.\setup.ps1
+```
+
+**Linux/Mac (Bash):**
+```bash
+chmod +x setup.sh
+./setup.sh
+```
+
+#### Option B: Manual Setup
 
 ```bash
 # Create virtual environment
 python -m venv .venv
 
 # Activate virtual environment
-# On Windows:
+# Windows:
 .\.venv\Scripts\activate
-# On Linux/Mac:
+# Linux/Mac:
 source .venv/bin/activate
 
-# Install PyTorch (CPU version - faster to install)
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+# Install PyTorch CPU version (or see GPU instructions below)
+pip install torch==2.6.0+cpu torchvision==0.21.0+cpu --index-url https://download.pytorch.org/whl/cpu
 
-# Or for CUDA support (if you have an NVIDIA GPU):
-# pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
-
-# Install remaining dependencies
+# Install other dependencies
 pip install matplotlib pandas seaborn pyyaml tqdm opencv-python gitpython psutil scipy thop ultralytics
 ```
 
-### 3. Generate Dummy Dataset
+**For GPU Support (NVIDIA CUDA):**
+```bash
+# Instead of CPU PyTorch, install CUDA version:
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+```
+
+### Step 4: Generate Dummy Dataset
 
 ```bash
+# Activate venv if not already active
+# Windows: .\.venv\Scripts\activate
+# Linux/Mac: source .venv/bin/activate
+
 python scripts/create_dummy_dataset.py
 ```
 
-This creates a synthetic dataset at `data/dummy/` with:
-- 20 training images with colored rectangles
-- 5 validation images
-- YOLO-format labels (class_id, x_center, y_center, width, height)
+**Output:**
+- `data/dummy/images/train/` - 20 training images with colored rectangles
+- `data/dummy/images/val/` - 5 validation images
+- `data/dummy/labels/` - YOLO-format labels (class_id, x_center, y_center, width, height)
 - 3 classes: class1, class2, class3
 
-### 4. Train the Model
+**Customize dataset generation:**
+```bash
+python scripts/create_dummy_dataset.py --num_train 50 --num_val 10 --img_size 640
+```
+
+### Step 5: Train the Model
 
 **Using Python wrapper (recommended):**
 ```bash
-python scripts/train_model.py --epochs 50 --batch 16
+python scripts/train_model.py --epochs 50 --batch 8 --cache ram
 ```
 
-**Using PowerShell wrapper:**
+**Using PowerShell wrapper (Windows):**
 ```powershell
-.\scripts\train.ps1 -Epochs 50 -BatchSize 16
+.\scripts\train.ps1 -Epochs 50 -BatchSize 8
 ```
 
-**Direct YOLOv5 command (from yolov5/ directory):**
+**Direct command (from yolov5/ directory):**
 ```bash
 cd yolov5
-python train.py --img 640 --batch 16 --epochs 50 --data ../data/dataset.yaml --weights yolov5s.pt
+..\.venv\Scripts\python.exe train.py --img 640 --batch 8 --epochs 50 --data ../data/dataset.yaml --weights yolov5s.pt
 ```
 
-### 5. Validate the Model
+**Training outputs:**
+- Weights: `yolov5/runs/train/exp/weights/best.pt` and `last.pt`
+- Metrics: `yolov5/runs/train/exp/results.csv`
+- Visualizations: `yolov5/runs/train/exp/*.png` (loss curves, PR curves, etc.)
+
+### Step 6: Validate the Model
 
 **Using Python wrapper:**
 ```bash
-python scripts/validate_model.py --weights yolov5/runs/train/exp/weights/best.pt
+python scripts/validate_model.py --weights yolov5/runs/train/exp/weights/best.pt --verbose
 ```
 
 **Using PowerShell wrapper:**
 ```powershell
-.\scripts\val.ps1 -Weights "runs/train/exp/weights/best.pt"
+.\scripts\val.ps1 -Weights "runs/train/exp/weights/best.pt" -Verbose
 ```
 
-**Direct YOLOv5 command (from yolov5/ directory):**
+**Direct command (from yolov5/ directory):**
 ```bash
 cd yolov5
-python val.py --weights runs/train/exp/weights/best.pt --data ../data/dataset.yaml
+..\.venv\Scripts\python.exe val.py --weights runs/train/exp/weights/best.pt --data ../data/dataset.yaml --verbose
 ```
+
+**Validation outputs:**
+- Metrics: mAP50, mAP50-95, precision, recall per class
+- Visualizations: `yolov5/runs/val/exp/*.png` (confusion matrix, PR curves, etc.)
 
 ## Data Augmentation
 
@@ -212,9 +278,122 @@ For real datasets, add a preprocessing script at `scripts/preprocess_dataset.py`
 
 The training and validation pipeline remains unchanged.
 
+## Troubleshooting
+
+### PyTorch Installation Issues
+
+**Windows Long Path Error:**
+If you encounter "path too long" errors, use the virtual environment approach (already done in setup):
+```bash
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+```
+
+**CUDA Version Mismatch:**
+Check your CUDA version and install the matching PyTorch:
+```bash
+nvidia-smi  # Check CUDA version
+# Then install matching PyTorch from https://pytorch.org/
+```
+
+### Training Issues
+
+**Out of Memory:**
+- Reduce batch size: `--batch 4` or `--batch 2`
+- Use smaller model: `--weights yolov5n.pt` (nano) instead of yolov5s.pt
+
+**Slow Training:**
+- Use `--cache ram` to cache images in RAM
+- Reduce image size: `--img 416` instead of 640
+- Use GPU instead of CPU (see GPU setup in Quick Start)
+
+### Import Errors
+
+If you get "Module not found" errors:
+```bash
+# Make sure virtual environment is activated
+.\.venv\Scripts\activate  # Windows
+source .venv/bin/activate  # Linux/Mac
+
+# Reinstall dependencies
+pip install -r yolov5/requirements.txt
+```
+
+## Advanced Usage
+
+### Custom Training Parameters
+
+```bash
+# High accuracy (slower)
+python scripts/train_model.py --epochs 100 --batch 16 --weights yolov5l.pt
+
+# Fast training (lower accuracy)
+python scripts/train_model.py --epochs 50 --batch 32 --weights yolov5n.pt --img 416
+
+# Resume from checkpoint
+python scripts/train_model.py --resume
+
+# Disable augmentation
+python scripts/train_model.py --no-augment
+```
+
+### Hyperparameter Tuning
+
+Edit or create custom hyperparameter files in `yolov5/data/hyps/`:
+```bash
+cd yolov5
+python train.py --hyp data/hyps/hyp.scratch-high.yaml --data ../data/dataset.yaml
+```
+
+### Export Trained Model
+
+Export to different formats for deployment:
+```bash
+cd yolov5
+python export.py --weights runs/train/exp/weights/best.pt --include onnx tflite torchscript
+```
+
+## Project Maintenance
+
+### Updating YOLOv5
+
+```bash
+cd yolov5
+git pull origin master
+cd ..
+```
+
+### Cleaning Up
+
+```bash
+# Remove training outputs
+rm -rf yolov5/runs/
+
+# Remove dummy dataset
+rm -rf data/dummy/
+
+# Regenerate dummy dataset
+python scripts/create_dummy_dataset.py
+```
+
+## Contributing
+
+When contributing to this repository:
+1. Fork the repository
+2. Create a feature branch
+3. Test your changes with the dummy dataset
+4. Update documentation if needed
+5. Submit a pull request
+
+## License
+
+This project uses YOLOv5 which is licensed under AGPL-3.0. See [YOLOv5 License](https://github.com/ultralytics/yolov5/blob/master/LICENSE) for details.
+
 ## References
 
 - [YOLOv5 GitHub](https://github.com/ultralytics/yolov5)
 - [Training Custom Data](https://docs.ultralytics.com/yolov5/tutorials/train_custom_data/)
 - [PyTorch Hub](https://pytorch.org/hub/ultralytics_yolov5/)
 - [Data Augmentation](https://docs.ultralytics.com/yolov5/tutorials/tips_for_best_training_results/)
+- [YOLOv5 Documentation](https://docs.ultralytics.com/yolov5/)
