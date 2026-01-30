@@ -1,4 +1,4 @@
- """
+"""
  Preprocess and validate a fire/smoke dataset for YOLOv5 training.
  
  Expected input structure:
@@ -21,7 +21,7 @@
  Usage:
    python data/preprocess_fire_dataset.py --dataset-root "D:\\Fire Dataset"
    python data/preprocess_fire_dataset.py --dataset-root "/kaggle/working/D Fire Dataset"
- """
+"""
  
  import argparse
  import shutil
