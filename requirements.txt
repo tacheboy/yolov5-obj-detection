@@ -1,0 +1,17 @@
+torch>=2.0
+torchvision
+opencv-python
+numpy
+pandas
+pyyaml
+tqdm
+matplotlib
+ 
+fastapi
+uvicorn
+python-multipart
+ 
+onnx
+onnxruntime
+ 
+ultralytics
