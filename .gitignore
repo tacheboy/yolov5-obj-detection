@@ -49,7 +49,7 @@ runs/
 *.weights
 
 # Dataset - generated dummy data (can be regenerated)
-data/dummy/
+# data/dummy/
 
 # Processed datasets (user data - don't commit)
 data/processed/
@@ -65,3 +65,10 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Artifacts (generated models)
+artifacts/*.pt
+artifacts/*.onnx
+
+# Reports (generated)
+reports/*.md

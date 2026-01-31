@@ -1,0 +1,5 @@
+# This directory contains generated reports
+# Generated files:
+#   - inference_benchmark.md: Performance benchmark results
+#
+# Run: python scripts/benchmark_inference.py

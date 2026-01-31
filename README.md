@@ -10,6 +10,9 @@ A complete pipeline for training and validating YOLOv5 models on custom datasets
 - 💻 Cross-platform wrapper scripts (Python & PowerShell)
 - 📝 Easy-to-follow setup for new users
 - 🎯 Ready for custom dataset preprocessing
+- 🔧 ONNX model export for optimized inference
+- 🌐 FastAPI REST service for production deployment
+- ⚡ Inference benchmarking with performance reports
 
 ## Table of Contents
 
@@ -19,6 +22,9 @@ A complete pipeline for training and validating YOLOv5 models on custom datasets
 - [Training Options](#training-options)
 - [Model Variants](#model-variants)
 - [Data Augmentation](#data-augmentation)
+- [ONNX Export](#onnx-export)
+- [FastAPI Inference Service](#fastapi-inference-service)
+- [Inference Benchmarking](#inference-benchmarking)
 - [Using Your Own Dataset](#using-your-own-dataset)
 - [Troubleshooting](#troubleshooting)
 - [Advanced Usage](#advanced-usage)
@@ -29,6 +35,12 @@ A complete pipeline for training and validating YOLOv5 models on custom datasets
 ```
 yolov5-obj-detection/
 ├── .venv/                        # Python virtual environment
+├── api/
+│   ├── app.py                    # FastAPI inference service
+│   └── model.py                  # ONNX model loader
+├── artifacts/                    # Exported models (generated)
+│   ├── best.pt                   # PyTorch weights copy
+│   └── model.onnx                # ONNX exported model
 ├── data/
 │   ├── dummy/
 │   │   ├── dataset.yaml          # Dummy dataset config
@@ -41,7 +53,11 @@ yolov5-obj-detection/
 │   ├── fire_data/
 │   │   ├── fire_dataset.yaml     # Fire/smoke dataset config
 │   │   └── preprocess_fire_dataset.py
+├── reports/                      # Performance reports (generated)
+│   └── inference_benchmark.md    # Benchmark results
 ├── scripts/
+│   ├── benchmark_inference.py    # Measure inference speed
+│   ├── convert_to_onnx.py        # Export model to ONNX
 │   ├── create_dummy_dataset.py   # Generate synthetic training data
 │   ├── train_model.py            # Python training wrapper
 │   ├── validate_model.py         # Python validation wrapper
@@ -196,6 +212,152 @@ Or use a custom hyperparameter file:
 cd yolov5
 python train.py --hyp data/hyps/hyp.no-augmentation.yaml --data ../data/dummy/dataset.yaml --weights yolov5s.pt
 ```
+
+## ONNX Export
+
+Export your trained model to ONNX format for optimized inference:
+
+```bash
+# Auto-detect latest trained model and export
+python scripts/convert_to_onnx.py
+
+# Specify weights and output path
+python scripts/convert_to_onnx.py --weights yolov5/runs/train/exp/weights/best.pt --output artifacts/model.onnx
+
+# Export with dynamic batch size
+python scripts/convert_to_onnx.py --dynamic --simplify
+```
+
+**Export Options:**
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--weights` | auto-detect | Path to PyTorch weights |
+| `--output` | artifacts/model.onnx | Output ONNX path |
+| `--img` | 640 | Input image size |
+| `--opset` | 12 | ONNX opset version |
+| `--simplify` | False | Simplify model with onnxslim |
+| `--dynamic` | False | Enable dynamic batch size |
+
+**Output:**
+- `artifacts/model.onnx` - Exported ONNX model
+- `artifacts/best.pt` - Copy of source PyTorch weights
+
+## FastAPI Inference Service
+
+Run object detection as a REST API:
+
+### Start the Server
+
+```bash
+# Install API dependencies (if not done)
+pip install fastapi uvicorn python-multipart onnxruntime
+
+# Start the server
+uvicorn api.app:app --host 0.0.0.0 --port 8000
+
+# Or run directly
+python api/app.py
+```
+
+### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Health check |
+| `/model` | GET | Model information |
+| `/predict` | POST | Run inference on image |
+| `/docs` | GET | Swagger UI documentation |
+
+### Example: Run Inference
+
+**Using curl:**
+```bash
+curl -X POST "http://localhost:8000/predict" \
+  -H "accept: application/json" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@path/to/image.jpg"
+```
+
+**Using Python requests:**
+```python
+import requests
+
+with open("image.jpg", "rb") as f:
+    response = requests.post(
+        "http://localhost:8000/predict",
+        files={"file": f},
+        params={"conf_threshold": 0.5}
+    )
+    print(response.json())
+```
+
+**Response format:**
+```json
+{
+  "success": true,
+  "num_detections": 2,
+  "detections": [
+    {
+      "box": {"x1": 100, "y1": 50, "x2": 200, "y2": 150},
+      "confidence": 0.92,
+      "class_id": 0,
+      "class_name": "circle"
+    }
+  ],
+  "image_size": {"width": 640, "height": 480}
+}
+```
+
+### Configuration
+
+Set environment variables to customize:
+
+```bash
+# Custom model path
+export MODEL_PATH=/path/to/model.onnx
+
+# Adjust thresholds
+export CONF_THRESHOLD=0.3
+export IOU_THRESHOLD=0.5
+
+# Disable GPU
+export USE_GPU=false
+
+# Custom class names
+export CLASS_NAMES=cat,dog,bird
+```
+
+## Inference Benchmarking
+
+Measure inference speed for both PyTorch and ONNX models:
+
+```bash
+# Run benchmark with defaults
+python scripts/benchmark_inference.py
+
+# Custom settings
+python scripts/benchmark_inference.py --runs 100 --warmup 20 --img 640
+
+# Specify model paths
+python scripts/benchmark_inference.py \
+  --pt-weights artifacts/best.pt \
+  --onnx-weights artifacts/model.onnx
+```
+
+**Benchmark Options:**
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--pt-weights` | auto-detect | PyTorch model path |
+| `--onnx-weights` | artifacts/model.onnx | ONNX model path |
+| `--img` | 640 | Input image size |
+| `--runs` | 50 | Number of benchmark runs |
+| `--warmup` | 10 | Warmup runs before timing |
+| `--output` | reports/inference_benchmark.md | Report output path |
+
+**Output:**
+- `reports/inference_benchmark.md` - Detailed performance report with latency statistics and FPS
 
 ## Training Options
 

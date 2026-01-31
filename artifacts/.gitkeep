@@ -1,0 +1,6 @@
+# This directory contains exported model artifacts
+# Generated files:
+#   - best.pt: PyTorch weights (copy from training)
+#   - model.onnx: ONNX exported model
+#
+# Run: python scripts/convert_to_onnx.py
