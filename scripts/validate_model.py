@@ -59,6 +59,21 @@ def find_best_weights(yolo_dir: Path) -> str:
     
     return None
 
+def detect_cuda_available(python_exe: str) -> bool:
+    """Detect CUDA availability using the selected Python interpreter."""
+    try:
+        result = subprocess.run(
+            [python_exe, "-c", "import torch; print(torch.cuda.is_available())"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            return False
+        return result.stdout.strip().lower() == "true"
+    except Exception:
+        return False
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -110,6 +125,12 @@ def main():
     parser.add_argument(
         "--save-json", action="store_true", help="Save results to COCO JSON"
     )
+    parser.add_argument(
+        "--device",
+        type=str,
+        default="auto",
+        help="Device to use: auto, cpu, cuda, or CUDA device index (default: auto)",
+    )
     
     args = parser.parse_args()
     
@@ -132,6 +153,12 @@ def main():
     
     # Default data path (relative to yolov5 directory)
     data_path = args.data or "../data/dummy/dataset.yaml"
+
+    # Resolve device
+    device_arg = args.device
+    if args.device.lower() == "auto":
+        cuda_available = detect_cuda_available(python_exe)
+        device_arg = "0" if cuda_available else "cpu"
     
     # Build validation command
     cmd = [
@@ -144,6 +171,7 @@ def main():
         "--task", args.task,
         "--conf-thres", str(args.conf_thres),
         "--iou-thres", str(args.iou_thres),
+        "--device", device_arg,
     ]
     
     if args.verbose:
@@ -165,6 +193,7 @@ def main():
     print(f"Task: {args.task}")
     print(f"Batch size: {args.batch}")
     print(f"Image size: {args.img}")
+    print(f"Device: {device_arg}")
     print("=" * 60)
     print(f"\nCommand: {' '.join(cmd)}\n")
     

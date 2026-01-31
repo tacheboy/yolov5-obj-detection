@@ -15,6 +15,15 @@ try:
 except ImportError:
     ONNX_AVAILABLE = False
 
+def select_onnx_providers(use_gpu: bool) -> List[str]:
+    """Select ONNX Runtime execution providers based on availability."""
+    if not ONNX_AVAILABLE:
+        return []
+    available = ort.get_available_providers()
+    if use_gpu and "CUDAExecutionProvider" in available:
+        return ["CUDAExecutionProvider", "CPUExecutionProvider"]
+    return ["CPUExecutionProvider"]
+
 
 class YOLOv5ONNX:
     """YOLOv5 ONNX model wrapper for inference."""
@@ -49,10 +58,9 @@ class YOLOv5ONNX:
         self.class_names = class_names or []
         
         # Select execution providers
-        providers = []
-        if use_gpu:
-            providers.append('CUDAExecutionProvider')
-        providers.append('CPUExecutionProvider')
+        providers = select_onnx_providers(use_gpu)
+        if use_gpu and "CUDAExecutionProvider" not in providers:
+            print("Warning: CUDA provider not available. Falling back to CPU.")
         
         # Load model
         self.session = ort.InferenceSession(str(model_path), providers=providers)

@@ -154,6 +154,12 @@ python scripts/create_dummy_dataset.py --num_train 50 --num_val 10 --img_size 64
 python scripts/train_model.py --epochs 50 --batch 8 --cache ram
 ```
 
+GPU is used automatically if available. To force a device:
+```bash
+python scripts/train_model.py --device cpu
+python scripts/train_model.py --device 0
+```
+
 **Using PowerShell wrapper (Windows):**
 ```powershell
 .\scripts\train.ps1 -Epochs 50 -BatchSize 8
@@ -175,6 +181,12 @@ cd yolov5
 **Using Python wrapper:**
 ```bash
 python scripts/validate_model.py --weights yolov5/runs/train/exp/weights/best.pt --verbose
+```
+
+GPU is used automatically if available. To force a device:
+```bash
+python scripts/validate_model.py --device cpu
+python scripts/validate_model.py --device 0
 ```
 
 **Using PowerShell wrapper:**
@@ -321,7 +333,7 @@ export MODEL_PATH=/path/to/model.onnx
 export CONF_THRESHOLD=0.3
 export IOU_THRESHOLD=0.5
 
-# Disable GPU
+# Disable GPU (CPU fallback is automatic if CUDA is unavailable)
 export USE_GPU=false
 
 # Custom class names
@@ -339,11 +351,17 @@ python scripts/benchmark_inference.py
 # Custom settings
 python scripts/benchmark_inference.py --runs 100 --warmup 20 --img 640
 
+# Force CPU or GPU
+python scripts/benchmark_inference.py --device cpu
+python scripts/benchmark_inference.py --device cuda
+
 # Specify model paths
 python scripts/benchmark_inference.py \
   --pt-weights artifacts/best.pt \
   --onnx-weights artifacts/model.onnx
 ```
+
+Note: ONNX GPU inference requires `onnxruntime-gpu`. If it's not installed, the benchmark falls back to CPU.
 
 **Benchmark Options:**
 
@@ -355,6 +373,7 @@ python scripts/benchmark_inference.py \
 | `--runs` | 50 | Number of benchmark runs |
 | `--warmup` | 10 | Warmup runs before timing |
 | `--output` | reports/inference_benchmark.md | Report output path |
+| `--device` | auto | Device for PyTorch/ONNX (auto/cpu/cuda) |
 
 **Output:**
 - `reports/inference_benchmark.md` - Detailed performance report with latency statistics and FPS
@@ -370,6 +389,7 @@ python scripts/benchmark_inference.py \
 | `--data` | ../data/dummy/dataset.yaml | Dataset configuration |
 | `--cache` | None | Cache images (ram/disk) for faster training |
 | `--resume` | False | Resume from last checkpoint |
+| `--device` | auto | Device for training (auto/cpu/cuda or index) |
 
 ## Model Variants
 

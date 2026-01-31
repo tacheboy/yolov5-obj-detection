@@ -85,6 +85,30 @@ def preprocess_image(img: np.ndarray, img_size: int = 640) -> np.ndarray:
     img = np.expand_dims(img, axis=0)
     return img
 
+def normalize_device(device: str) -> str:
+    """Normalize device input for PyTorch."""
+    device = device.lower()
+    if device == "cpu":
+        return "cpu"
+    if device == "auto":
+        return "cuda" if CUDA_AVAILABLE else "cpu"
+    if device.startswith("cuda"):
+        return device
+    if device.isdigit() or "," in device:
+        return "cuda"
+    if device in {"gpu"}:
+        return "cuda"
+    return device
+
+def select_onnx_providers(use_gpu: bool) -> list:
+    """Select ONNX Runtime execution providers."""
+    if not ONNX_AVAILABLE:
+        return []
+    available = ort.get_available_providers()
+    if use_gpu and "CUDAExecutionProvider" in available:
+        return ["CUDAExecutionProvider", "CPUExecutionProvider"]
+    return ["CPUExecutionProvider"]
+
 
 def benchmark_pytorch(weights_path: str, img: np.ndarray, runs: int, warmup: int, device: str):
     """Benchmark PyTorch model inference."""
@@ -134,7 +158,9 @@ def benchmark_onnx(onnx_path: str, img: np.ndarray, runs: int, warmup: int, use_
     
     try:
         # Select execution provider
-        providers = ['CUDAExecutionProvider', 'CPUExecutionProvider'] if use_gpu else ['CPUExecutionProvider']
+        providers = select_onnx_providers(use_gpu)
+        if not providers:
+            return None, "ONNX Runtime not available"
         
         # Load model
         session = ort.InferenceSession(onnx_path, providers=providers)
@@ -281,6 +307,12 @@ def main():
         default=None,
         help="Output report path (default: reports/inference_benchmark.md)",
     )
+    parser.add_argument(
+        "--device",
+        type=str,
+        default="auto",
+        help="Device to use for PyTorch/ONNX: auto, cpu, cuda (default: auto)",
+    )
     
     args = parser.parse_args()
     
@@ -322,7 +354,9 @@ def main():
     results = {}
     
     # Determine device
-    device = "cuda" if CUDA_AVAILABLE else "cpu"
+    device = normalize_device(args.device)
+    if device.startswith("cuda") and not CUDA_AVAILABLE:
+        device = "cpu"
     
     # Benchmark PyTorch
     if pt_weights and Path(pt_weights).exists():
@@ -342,8 +376,9 @@ def main():
     # Benchmark ONNX
     if onnx_weights and Path(onnx_weights).exists():
         print(f"\n[2/2] Benchmarking ONNX model...")
+        use_gpu = device.startswith("cuda")
         times, provider_or_error = benchmark_onnx(
-            onnx_weights, preprocessed_img, args.runs, args.warmup, use_gpu=CUDA_AVAILABLE
+            onnx_weights, preprocessed_img, args.runs, args.warmup, use_gpu=use_gpu
         )
         if times:
             results["ONNX"] = {

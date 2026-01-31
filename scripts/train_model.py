@@ -16,7 +16,6 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['WANDB_MODE'] = 'disabled'
 
 import argparse
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -54,6 +53,21 @@ def install_yolov5_requirements(yolo_dir: Path):
             [sys.executable, "-m", "pip", "install", "-r", str(requirements_file)],
             check=False,
         )
+
+def detect_cuda_available(python_exe: str) -> bool:
+    """Detect CUDA availability using the selected Python interpreter."""
+    try:
+        result = subprocess.run(
+            [python_exe, "-c", "import torch; print(torch.cuda.is_available())"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            return False
+        return result.stdout.strip().lower() == "true"
+    except Exception:
+        return False
 
 
 def main():
@@ -104,6 +118,12 @@ def main():
         action="store_true",
         help="Install YOLOv5 requirements before training",
     )
+    parser.add_argument(
+        "--device",
+        type=str,
+        default="auto",
+        help="Device to use: auto, cpu, cuda, or CUDA device index (default: auto)",
+    )
     
     args = parser.parse_args()
     
@@ -120,6 +140,12 @@ def main():
     
     # Default data path (relative to yolov5 directory)
     data_path = args.data or "../data/dummy/dataset.yaml"
+
+    # Resolve device
+    device_arg = args.device
+    if args.device.lower() == "auto":
+        cuda_available = detect_cuda_available(python_exe)
+        device_arg = "0" if cuda_available else "cpu"
     
     # Build training command
     cmd = [
@@ -130,6 +156,7 @@ def main():
         "--epochs", str(args.epochs),
         "--data", data_path,
         "--weights", args.weights,
+        "--device", device_arg,
     ]
     
     if args.name:
@@ -154,6 +181,7 @@ def main():
     print(f"Epochs: {args.epochs}")
     print(f"Batch size: {args.batch}")
     print(f"Image size: {args.img}")
+    print(f"Device: {device_arg}")
     print(f"Augmentation: {'disabled' if args.no_augment else 'enabled (default)'}")
     print("=" * 60)
     print(f"\nCommand: {' '.join(cmd)}\n")

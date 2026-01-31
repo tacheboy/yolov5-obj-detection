@@ -10,7 +10,8 @@ param(
     [int]$BatchSize = 32,
     [int]$ImgSize = 640,
     [string]$Task = "val",
-    [switch]$Verbose
+    [switch]$Verbose,
+    [string]$Device = "auto"
 )
 
 # Navigate to yolov5 directory
@@ -27,6 +28,21 @@ if (-not (Test-Path $YoloDir)) {
 Push-Location $YoloDir
 
 try {
+    # Resolve device
+    $ResolvedDevice = $Device
+    if ($Device -eq "auto") {
+        try {
+            $CudaAvailable = & python -c "import torch; print(torch.cuda.is_available())" 2>$null
+        } catch {
+            $CudaAvailable = ""
+        }
+        if ($CudaAvailable -match "True") {
+            $ResolvedDevice = "0"
+        } else {
+            $ResolvedDevice = "cpu"
+        }
+    }
+
     # Check if weights file exists
     if (-not (Test-Path $Weights)) {
         Write-Error "Weights file not found at $Weights"
@@ -42,6 +58,7 @@ try {
     $cmd += "--batch-size", $BatchSize
     $cmd += "--img", $ImgSize
     $cmd += "--task", $Task
+    $cmd += "--device", $ResolvedDevice
     
     if ($Verbose) {
         $cmd += "--verbose"

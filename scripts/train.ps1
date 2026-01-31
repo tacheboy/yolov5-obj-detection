@@ -12,7 +12,8 @@ param(
     [string]$Data = "../data/dummy/dataset.yaml",
     [string]$Name = "",
     [switch]$Resume,
-    [switch]$NoAugment
+    [switch]$NoAugment,
+    [string]$Device = "auto"
 )
 
 # Navigate to yolov5 directory
@@ -29,6 +30,21 @@ if (-not (Test-Path $YoloDir)) {
 Push-Location $YoloDir
 
 try {
+    # Resolve device
+    $ResolvedDevice = $Device
+    if ($Device -eq "auto") {
+        try {
+            $CudaAvailable = & python -c "import torch; print(torch.cuda.is_available())" 2>$null
+        } catch {
+            $CudaAvailable = ""
+        }
+        if ($CudaAvailable -match "True") {
+            $ResolvedDevice = "0"
+        } else {
+            $ResolvedDevice = "cpu"
+        }
+    }
+
     # Build the training command
     $cmd = @("python", "train.py")
     $cmd += "--img", $ImgSize
@@ -36,6 +52,7 @@ try {
     $cmd += "--epochs", $Epochs
     $cmd += "--data", $Data
     $cmd += "--weights", $Weights
+    $cmd += "--device", $ResolvedDevice
     
     if ($Name) {
         $cmd += "--name", $Name
