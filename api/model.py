@@ -71,7 +71,9 @@ class YOLOv5ONNX:
         # Get active provider
         self.provider = self.session.get_providers()[0]
     
-    def preprocess(self, image: np.ndarray) -> Tuple[np.ndarray, float, Tuple[int, int]]:
+    def preprocess(
+        self, image: np.ndarray
+    ) -> Tuple[np.ndarray, float, Tuple[int, int], Tuple[int, int]]:
         """
         Preprocess image for model input.
         
@@ -79,7 +81,7 @@ class YOLOv5ONNX:
             image: Input image in BGR format (OpenCV)
         
         Returns:
-            Tuple of (preprocessed_image, scale_factor, original_size)
+            Tuple of (preprocessed_image, scale_factor, original_size, padding)
         """
         original_h, original_w = image.shape[:2]
         
@@ -300,7 +302,7 @@ def load_model(
         
         # Default class names for dummy dataset
         if class_names is None:
-            class_names = ["circle", "rectangle", "triangle"]
+            class_names = ["class1", "class2", "class3"]
         
         _model = YOLOv5ONNX(
             model_path=model_path,

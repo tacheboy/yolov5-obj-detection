@@ -1,7 +1,6 @@
 #!/bin/bash
 # YOLOv5 Object Detection - Setup Script for Linux/Mac
 # This script automates the setup process for the YOLOv5 object detection pipeline
-#setup
 set -e  # Exit on error
 
 echo "========================================"

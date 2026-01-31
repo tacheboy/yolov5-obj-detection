@@ -1,6 +1,5 @@
  # YOLOv5 Dataset Configuration (Dummy)
  # This file defines the dataset structure for training and validation.
- # hello
  # When running from the yolov5/ directory:
  #   python train.py --data ../data/dummy/dataset.yaml --weights yolov5s.pt --epochs 50
  #
